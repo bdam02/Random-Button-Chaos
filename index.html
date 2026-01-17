@@ -22,6 +22,7 @@
         text-align: center;
         width: 90%;
         max-width: 600px;
+        position: relative;
     }
     h1 { font-size: 2rem; margin-bottom: 20px; text-shadow: 2px 2px 5px black; }
     #score { font-size: 1.2rem; margin-bottom: 10px; }
@@ -37,6 +38,38 @@
         margin: 5px;
     }
     button:hover { background-color: #10ac84; }
+
+    /* Trophy button */
+    #trophyBtn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #feca57;
+        color: black;
+        font-size: 1.5rem;
+        padding: 10px 15px;
+    }
+    #trophyBtn:hover { background-color: #ff6b6b; color: white; }
+
+    /* Leaderboard */
+    #leaderboard {
+        position: absolute;
+        top: 50px;
+        right: 10px;
+        width: 200px;
+        background: rgba(0,0,0,0.7);
+        border-radius: 10px;
+        padding: 10px;
+        display: none;
+        text-align: left;
+        color: white;
+    }
+    #leaderboard h3 {
+        margin-top: 0;
+        text-align: center;
+        text-decoration: underline;
+    }
+
     .emoji {
         position: absolute;
         font-size: 2rem;
@@ -47,11 +80,6 @@
         0% {opacity: 1; transform: translateY(0);}
         100% {opacity: 0; transform: translateY(-200px);}
     }
-    #leaderboard {
-        margin-top: 20px;
-        font-size: 0.9rem;
-        text-align: left;
-    }
 </style>
 </head>
 <body>
@@ -59,7 +87,11 @@
     <h1>Random Chaos Clicker</h1>
     <div id="score">Score: 0</div>
     <button onclick="doChaos()">CLICK ME!</button>
-    <div id="leaderboard"></div>
+    <button id="trophyBtn" onclick="toggleLeaderboard()">🏆</button>
+    <div id="leaderboard">
+        <h3>Leaderboard</h3>
+        <div id="leaderboardContent"></div>
+    </div>
 </div>
 
 <script>
@@ -75,7 +107,7 @@ if (!username) {
 updateScore();
 updateLeaderboard();
 
-// ----------------- Helper functions -----------------
+// ----------------- Chaos function -----------------
 function randomColor() {
     const r = Math.floor(Math.random()*256);
     const g = Math.floor(Math.random()*256);
@@ -123,22 +155,18 @@ function updateScore() {
     document.getElementById('score').textContent = `Score: ${score}`;
 }
 
-// Fake global leaderboard
-function updateLeaderboard() {
-    const fakeScores = [
-        {name: 'Alice', score: 150},
-        {name: 'Bob', score: 120},
-        {name: 'Charlie', score: 90},
-        {name: username, score: score}
-    ];
-    fakeScores.sort((a,b)=>b.score-a.score);
+// ----------------- Leaderboard -----------------
+function toggleLeaderboard() {
     const lb = document.getElementById('leaderboard');
-    lb.innerHTML = '<strong>Top Clickers:</strong><br>';
-    fakeScores.slice(0,5).forEach((p,i)=>{
-        lb.innerHTML += `${i+1}. ${p.name} - ${p.score} clicks<br>`;
-    });
+    lb.style.display = lb.style.display === 'block' ? 'none' : 'block';
+}
+
+function updateLeaderboard() {
+    const lbContent = document.getElementById('leaderboardContent');
+    lbContent.innerHTML = `1. ${username} - ${score} clicks`;
 }
 </script>
 </body>
 </html>
+
 
