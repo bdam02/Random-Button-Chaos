@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Random Chaos Button</title>
+<title>Random Chaos Clicker</title>
 <style>
     body {
         margin: 0;
@@ -16,16 +16,15 @@
         background: linear-gradient(to right, #ff5f6d, #ffc371);
         overflow: hidden;
         transition: background 0.5s ease;
+        color: white;
     }
     #container {
         text-align: center;
+        width: 90%;
+        max-width: 600px;
     }
-    h1 {
-        font-size: 2rem;
-        margin-bottom: 20px;
-        color: white;
-        text-shadow: 2px 2px 5px black;
-    }
+    h1 { font-size: 2rem; margin-bottom: 20px; text-shadow: 2px 2px 5px black; }
+    #score { font-size: 1.2rem; margin-bottom: 10px; }
     button {
         padding: 15px 30px;
         font-size: 1.2rem;
@@ -35,10 +34,9 @@
         background-color: #1dd1a1;
         color: white;
         transition: transform 0.2s ease, background 0.3s ease;
+        margin: 5px;
     }
-    button:hover {
-        background-color: #10ac84;
-    }
+    button:hover { background-color: #10ac84; }
     .emoji {
         position: absolute;
         font-size: 2rem;
@@ -49,15 +47,35 @@
         0% {opacity: 1; transform: translateY(0);}
         100% {opacity: 0; transform: translateY(-200px);}
     }
+    #leaderboard {
+        margin-top: 20px;
+        font-size: 0.9rem;
+        text-align: left;
+    }
 </style>
 </head>
 <body>
 <div id="container">
-    <h1>Random Chaos Button</h1>
+    <h1>Random Chaos Clicker</h1>
+    <div id="score">Score: 0</div>
     <button onclick="doChaos()">CLICK ME!</button>
+    <div id="leaderboard"></div>
 </div>
 
 <script>
+// ----------------- Setup username -----------------
+let username = localStorage.getItem('username');
+let score = parseInt(localStorage.getItem('score')) || 0;
+
+if (!username) {
+    username = prompt("Welcome! Enter your username:");
+    if (!username) username = "Player";
+    localStorage.setItem('username', username);
+}
+updateScore();
+updateLeaderboard();
+
+// ----------------- Helper functions -----------------
 function randomColor() {
     const r = Math.floor(Math.random()*256);
     const g = Math.floor(Math.random()*256);
@@ -69,11 +87,11 @@ function doChaos() {
     // Change background color
     document.body.style.background = `linear-gradient(to right, ${randomColor()}, ${randomColor()})`;
 
-    // Move the button randomly
+    // Move button randomly
     const button = document.querySelector('button');
     button.style.transform = `translate(${Math.random()*200-100}px, ${Math.random()*200-100}px) rotate(${Math.random()*360}deg)`;
 
-    // Spawn random emojis
+    // Spawn random emoji
     const emojis = ['😂','🤯','🦄','👾','🔥','💥','🌈','🍕','🐱','🎉','⚡','🍭'];
     const emoji = document.createElement('div');
     emoji.className = 'emoji';
@@ -82,19 +100,45 @@ function doChaos() {
     emoji.style.top = Math.random()*window.innerHeight + 'px';
     emoji.style.color = randomColor();
     document.body.appendChild(emoji);
-
-    // Remove emoji after animation
     setTimeout(() => emoji.remove(), 3000);
 
-    // Optional: play a random beep sound
+    // Play soft beep
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = audioCtx.createOscillator();
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(Math.random()*1000+200, audioCtx.currentTime);
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(Math.random()*200+400, audioCtx.currentTime);
     oscillator.connect(audioCtx.destination);
     oscillator.start();
     oscillator.stop(audioCtx.currentTime + 0.1);
+
+    // Update score
+    score += 1;
+    localStorage.setItem('score', score);
+    updateScore();
+    updateLeaderboard();
+}
+
+// ----------------- Update UI -----------------
+function updateScore() {
+    document.getElementById('score').textContent = `Score: ${score}`;
+}
+
+// Fake global leaderboard
+function updateLeaderboard() {
+    const fakeScores = [
+        {name: 'Alice', score: 150},
+        {name: 'Bob', score: 120},
+        {name: 'Charlie', score: 90},
+        {name: username, score: score}
+    ];
+    fakeScores.sort((a,b)=>b.score-a.score);
+    const lb = document.getElementById('leaderboard');
+    lb.innerHTML = '<strong>Top Clickers:</strong><br>';
+    fakeScores.slice(0,5).forEach((p,i)=>{
+        lb.innerHTML += `${i+1}. ${p.name} - ${p.score} clicks<br>`;
+    });
 }
 </script>
 </body>
 </html>
+
